@@ -74,7 +74,7 @@ class Pred_config:
         return model
 
 class Predict:
-    def __init__(self, pred_config:Pred_config,keyword):
+    def __init__(self, pred_config:Pred_config,keyword=None,contents_id=None):
         self.pred_config = pred_config
         self.engine = create_engine(("mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8mb4").format('root','robot369',
                                                                                                 '1.221.75.76',3306,'datacast2'))
@@ -93,6 +93,7 @@ class Predict:
         self.tokenizer = self.pred_config.load_tokenizer()
         self.nlp = Mecab()
         self.keyword = keyword
+        self.contents_id = contents_id
         self.channel = 'navershopping'
         self.db = Sql("datacast2")
     def verbs(self,phrase):
@@ -118,16 +119,14 @@ class Predict:
 
 
         print('sql:',"SELECT ct.channel,cc.contents_id,cs.text from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id JOIN crawl_sentence AS cs ON cs.contents_id = cc.contents_id "
-            "WHERE ct.keyword=\'%s\' and ct.channel=\'%s\'" % (self.keyword, "navershopping"))
+            "WHERE cc.contents_id=\'%s\' and ct.keyword=\'%s\' and ct.channel=\'%s\'" % (self.contents_id ,self.keyword, "navershopping"))
         # df_sentence_rows = pd.read_sql("SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.keyword=\'%s\' limit %d,%d;"%(self.keyword,start_num,chunk_size),self.engine)
         df_sentence_rows = pd.read_sql(
             "SELECT ct.keyword,ct.channel,cc.contents_id as contents_id,cs.sentence_id as sentence_id, cs.text as sentence from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id JOIN crawl_sentence AS cs ON cs.contents_id = cc.contents_id "
-            "WHERE ct.keyword=\'%s\' and ct.channel=\'%s\'" % (
-            self.keyword, "navershopping"),
+            "WHERE cc.contents_id=\'%s\' and ct.keyword=\'%s\' and ct.channel=\'%s\'" % (
+            self.contents_id,self.keyword, "navershopping"),
             self.engine)
-        print('read finish',df_sentence_rows.loc[0,"keyword"],
-              df_sentence_rows.loc[0, "contents_id"],
-              df_sentence_rows.loc[0, "sentence_id"])
+
         return df_sentence_rows
 
     def convert_input_sentence_to_tensor_dataset(self,df_sentence_rows,cls_token_segment_id=0,
@@ -257,9 +256,7 @@ class Predict:
             except Exception as e:
                 print(e)
                 continue
-        selected_rows = self.db.select("crawl_request","*","channel=\'%s\' and keyword=\'%s\'"%(self.channel,self.keyword))
-        request_id = selected_rows[0]['request_id']
-        self.db.update_one("crawl_request","crawl_status","SF","request_id",request_id)
+
 
         # df_sentence_rows['sentiment_point'] = maximum_probs
         # df_sentence_rows.set_index('sentence_id',inplace=True)
