@@ -121,8 +121,15 @@ class Predict:
         # rows = curs.fetchall()
         ##pandas datatable 형태로 sentece 테이블 읽어들이기
 
-        print('sql:',"SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.task_id=%s and ct.keyword=\'%s\' and ct.channel !='navershopping'"%(self.task_id,self.keyword))
-        df_sentence_rows = pd.read_sql("SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.task_id=%s and ct.keyword=\'%s\' and ct.channel !='navershopping'"%(self.task_id,self.keyword),self.engine)
+        print('sql:',"SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_request as cr "
+                     "join crawl_request_task as crt on cr.request_id=crt.request_id "
+                     "join crawl_task as ct on ct.task_id= crt.task_id "
+                     "join crawl_contents as cc on ct.task_id=cc.task_id WHERE cr.request_id=\'%s\' and ct.channel !='navershopping'"%(self.request_id))
+
+        df_sentence_rows = pd.read_sql("SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_request as cr "
+                     "join crawl_request_task as crt on cr.request_id=crt.request_id "
+                     "join crawl_task as ct on ct.task_id= crt.task_id "
+                     "join crawl_contents as cc on ct.task_id=cc.task_id WHERE cr.request_id=\'%s\' and ct.channel !='navershopping'"%(self.request_id),self.engine)
         df_sentence_rows = df_sentence_rows[df_sentence_rows['text'].apply(lambda x : len(x)<5000)]
         print('read finish')
         return df_sentence_rows

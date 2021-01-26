@@ -12,7 +12,7 @@ for row in contents_row:
     db.update_one('crawl_contents', 'crawl_status', 'SI', 'contents_id', contents_id)
     n_reply_crawled = row['n_reply_crawled']
     print(keyword,contents_id,n_reply_crawled)
-    if n_reply_crawled and n_reply_crawled > 0:
+    if n_reply_crawled is not None and n_reply_crawled > 0:
         obj_predict = Predict(obj_pred_config,keyword=keyword,contents_id=contents_id)
         obj_predict.predict()
     else:
