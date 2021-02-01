@@ -27,13 +27,13 @@ stopwords.extend(['https','http','@'])
 stop_list = ['//']
 
 class Predict:
-    def __init__(self,keyword,channel):
+    def __init__(self,keyword,channel,contents_id):
         self.engine = create_engine(("mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8mb4").format('root','robot369',
                                                                                                 '1.221.75.76',3306,'datacast2'))
         self.keyword = keyword
         self.channel = channel
         self.splitter = NNSplit.load("en")
-
+        self.contents_id = contents_id
     # def nouns(self,phrase):
     #     """Nouns extractor."""
     #     verbs = ['VV']
@@ -61,9 +61,14 @@ class Predict:
         # rows = curs.fetchall()
         ##pandas datatable 형태로 sentece 테이블 읽어들이기
 
-        print('sql:',"SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.keyword=\'%s\' and ct.channel =\'%s\'"%(self.keyword,self.channel))
-        df_sentence_rows = pd.read_sql("SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.keyword=\'%s\' and ct.channel ='\'%s\'"%(self.keyword,self.channel),self.engine)
-        print('read finish')
+        print('sql:',
+              "SELECT ct.channel,cc.contents_id,cs.text from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id JOIN crawl_sentence AS cs ON cs.contents_id = cc.contents_id "
+              "WHERE cc.contents_id=\'%s\' and ct.keyword=\'%s\'" % (self.contents_id, self.keyword))
+        df_sentence_rows = pd.read_sql(
+            "SELECT ct.keyword,ct.channel,cc.contents_id as contents_id,cs.sentence_id as sentence_id, cs.text as sentence from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id JOIN crawl_sentence AS cs ON cs.contents_id = cc.contents_id "
+            "WHERE cc.contents_id=\'%s\' and ct.keyword=\'%s\'" % (
+            self.contents_id,self.keyword),
+            self.engine)
         return df_sentence_rows
 
 
