@@ -16,9 +16,9 @@ from utils import init_logger, load_tokenizer
 from eunjeon import Mecab
 import kss
 import json
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
-
 from transformers import (
     BertConfig,
     DistilBertConfig,
@@ -42,7 +42,7 @@ MODEL_CLASSES = {
 
 class Pred_config:
     def __init__(self,
-                 model_dir='./model',
+                 model_dir=f"{str(Path.cwd().parents[0])}/model",
                  batch_size=64,no_cuda=False):
         self.model_dir = model_dir
         self.batch_size = batch_size

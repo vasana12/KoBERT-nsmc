@@ -2,7 +2,7 @@ from predict_execution_blog import *
 from db.almaden import Sql
 db = Sql("datacast2")
 
-blog_channel_list = str(('naverblog','instagram','GooglePlay','forum','navercafe'))
+blog_channel_list = str(('naverblog','instagram','GooglePlay'))
 review_channel_list = str(('navershopping','youtube'))
 
 task_row = db.select('''
@@ -22,7 +22,7 @@ for row in task_row:
 
     real_task = db.select('crawl_task','*','task_id=%s'%(task_id))
     real_crawl_status = real_task[0]['crawl_status']
-    print(task_id)
+
     if real_crawl_status=='GF':
         db.update_one('crawl_task', 'crawl_status', 'SI', 'task_id', task_id)
         obj_predict = Predict(obj_pred_config,task_id=task_id,keyword=row['keyword'],channel=row['channel'])

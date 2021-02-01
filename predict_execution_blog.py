@@ -78,7 +78,7 @@ class Pred_config:
         return model
 
 class Predict:
-    def __init__(self, pred_config:Pred_config,request_id = None,task_id = None, keyword=None,channel=None):
+    def __init__(self, pred_config:Pred_config,task_id = None, keyword=None,channel=None):
         self.pred_config = pred_config
         self.engine = create_engine(("mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8mb4").format('root','robot369',
                                                                                                 '1.221.75.76',3306,'datacast2'))
@@ -96,7 +96,6 @@ class Predict:
         ##토크나이저 가져오기
         self.tokenizer = self.pred_config.load_tokenizer()
         self.nlp = Mecab()
-        self.request_id = request_id
         self.task_id = task_id
         self.keyword = keyword
         self.channel = channel
@@ -121,8 +120,8 @@ class Predict:
         # rows = curs.fetchall()
         ##pandas datatable 형태로 sentece 테이블 읽어들이기
 
-        print('sql:',"SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.task_id=%s and ct.keyword=\'%s\' and ct.channel !='navershopping'"%(self.task_id,self.keyword))
-        df_sentence_rows = pd.read_sql("SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.task_id=%s and ct.keyword=\'%s\' and ct.channel !='navershopping'"%(self.task_id,self.keyword),self.engine)
+        print('sql:',"SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.task_id=%s and ct.keyword=\'%s\'"%(self.task_id,self.keyword))
+        df_sentence_rows = pd.read_sql("SELECT ct.task_id,ct.channel,cc.contents_id,cc.text,cc.url from crawl_task as ct join crawl_contents as cc on ct.task_id=cc.task_id WHERE ct.task_id=%s and ct.keyword=\'%s\'"%(self.task_id,self.keyword),self.engine)
         df_sentence_rows = df_sentence_rows[df_sentence_rows['text'].apply(lambda x : len(x)<5000)]
         print('read finish')
         return df_sentence_rows
