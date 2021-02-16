@@ -77,7 +77,7 @@ class Predict:
     def __init__(self, pred_config:Pred_config,keyword=None,contents_id=None):
         self.pred_config = pred_config
         self.engine = create_engine(("mysql+pymysql://{}:{}@{}:{}/{}?charset=utf8mb4").format('root','robot369',
-                                                                                                '1.221.75.76',3306,'datacast2'))
+                                                                                                '10.96.5.179',3306,'datacast2'))
         self.args = self.pred_config.get_args()
 
         ##쿠다, cpu 중 사용할 디바이스 설정

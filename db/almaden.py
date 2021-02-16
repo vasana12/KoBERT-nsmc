@@ -80,7 +80,7 @@ class SeleniumDriver :
 
 class Sql :
     def __init__(self, dbName, comment = "",
-                 hostIP='1.221.75.76',
+                 hostIP='10.96.5.179',
                  userID='root', password='robot369', charset='utf8mb4'):
         self.dbName = dbName
         self.hostIP = hostIP
