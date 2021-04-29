@@ -99,6 +99,7 @@ class Predict:
         self.task_id = task_id
         self.keyword = keyword
         self.channel = channel
+
     def verbs(self,phrase):
         """Verbs extractor."""
         verbs = ['VV']
@@ -106,7 +107,6 @@ class Predict:
         return [s for s, t in tagged if t in verbs]
 
     def adjs(self,phrase):
-
         """Adjs extractor."""
         adjs = ['VA','IC']
         tagged = self.nlp.pos(phrase)

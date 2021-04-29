@@ -10,7 +10,7 @@ crawl_request AS cr JOIN crawl_request_task AS crt ON cr.request_id=crt.request_
 JOIN request_batch AS rb ON rb.batch_id = cr.batch_id
 JOIN crawl_task AS ct ON crt.task_id=ct.task_id
 ''','rb.batch_id as batch_id,cr.request_id as request_id,ct.task_id as task_id,cr.keyword as keyword,ct.n_crawl,ct.crawl_status as crawl_status,ct.channel as channel'
-,'ct.crawl_status="GF" and ct.channel in %s'%(blog_channel_list))
+,'ct.crawl_status="GF" and rb.batch_id=%s and ct.channel in %s'%(96,blog_channel_list))
 ## pred_confing
 obj_pred_config = Pred_config()
 
